@@ -1,11 +1,29 @@
 from flask import Flask, jsonify, request
 import os
+import cv2
+import numpy as np
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# -----------------------------
+# Image Preprocessing Function
+# -----------------------------
+def preprocess_image(image_path):
+    """
+    Preprocess image for AI model input
+    """
+    image = cv2.imread(image_path)
+    image = cv2.resize(image, (224, 224))
+    image = image / 255.0          # normalize
+    image = np.expand_dims(image, axis=0)
+    return image
+
+# -----------------------------
+# Routes
+# -----------------------------
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({
@@ -29,6 +47,9 @@ def predict_disease():
     image_path = os.path.join(UPLOAD_FOLDER, image.filename)
     image.save(image_path)
 
+    # ✅ Image preprocessing (Day 5 work)
+    processed_image = preprocess_image(image_path)
+
     # Dummy AI prediction (placeholder)
     prediction = {
         "disease": "Leaf Blight",
@@ -37,7 +58,7 @@ def predict_disease():
     }
 
     return jsonify({
-        "message": "Image received successfully",
+        "message": "Image received and preprocessed successfully",
         "prediction": prediction
     })
 
