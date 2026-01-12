@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import os
 import cv2
 import numpy as np
+import random
 
 app = Flask(__name__)
 
@@ -20,6 +21,28 @@ def preprocess_image(image_path):
     image = image / 255.0          # normalize
     image = np.expand_dims(image, axis=0)
     return image
+
+# -----------------------------
+# Disease Class Mapping (Day 6)
+# -----------------------------
+DISEASE_CLASSES = {
+    0: "Healthy",
+    1: "Leaf Blight",
+    2: "Leaf Spot",
+    3: "Powdery Mildew",
+    4: "Rust"
+}
+
+# -----------------------------
+# Model Inference Placeholder
+# -----------------------------
+def load_model_and_predict(processed_image):
+    """
+    Placeholder for real AI model inference
+    """
+    predicted_class = random.randint(0, len(DISEASE_CLASSES) - 1)
+    confidence = round(random.uniform(0.75, 0.95), 2)
+    return predicted_class, confidence
 
 # -----------------------------
 # Routes
@@ -47,18 +70,21 @@ def predict_disease():
     image_path = os.path.join(UPLOAD_FOLDER, image.filename)
     image.save(image_path)
 
-    # ✅ Image preprocessing (Day 5 work)
+    # Image preprocessing
     processed_image = preprocess_image(image_path)
 
-    # Dummy AI prediction (placeholder)
+    # Model inference (Day 6 placeholder)
+    predicted_class, confidence = load_model_and_predict(processed_image)
+    disease_name = DISEASE_CLASSES[predicted_class]
+
     prediction = {
-        "disease": "Leaf Blight",
-        "confidence": "0.87",
+        "disease": disease_name,
+        "confidence": confidence,
         "advice": "Use recommended fungicide and monitor crop regularly"
     }
 
     return jsonify({
-        "message": "Image received and preprocessed successfully",
+        "message": "Image processed and disease predicted successfully",
         "prediction": prediction
     })
 
